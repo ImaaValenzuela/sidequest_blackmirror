@@ -16,7 +16,7 @@ export default function MessageBubble({
   isAuditMode,
   isDarkMode
 }: MessageBubbleProps) {
-  const isMe = message.sender === 'me';
+  const isMe = message.sender === 'me' || message.senderId === '+5491155559999' || message.senderName === 'Tú';
   const isFiltering = message.status === 'filtering';
   const isFailed = message.status === 'failed';
 

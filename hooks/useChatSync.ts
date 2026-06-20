@@ -8,9 +8,11 @@ import { db, auth } from '../lib/firebase';
 export interface Message {
   id: string;
   sender: 'me' | 'other';
+  senderId?: string;
+  senderName?: string;
   text: string;
   originalText?: string;
-  status: 'filtering' | 'filtered' | 'failed';
+  status: 'filtering' | 'filtered' | 'failed' | 'sent' | 'received';
   timestamp: number;
   profile: 'couple' | 'family' | 'corporate';
   toxicityLevel?: number;

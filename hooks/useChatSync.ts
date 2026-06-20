@@ -40,6 +40,7 @@ export function useChatSync() {
   const [isSending, setIsSending] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
+  const [users, setUsers] = useState<Record<string, any>>({});
   
   const [metrics, setMetrics] = useState({
     avoidedFights: 0,
@@ -141,6 +142,47 @@ export function useChatSync() {
       return () => unsubscribe();
     }
   }, [isFirebaseConnected]);
+
+  // Sync users list from Firebase
+  useEffect(() => {
+    if (isFirebaseConnected && db) {
+      const usersRef = ref(db, 'mellow_users');
+      const unsubscribe = onValue(usersRef, (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          setUsers(val);
+        } else {
+          setUsers({});
+        }
+      });
+      return () => unsubscribe();
+    }
+  }, [isFirebaseConnected]);
+
+  // Create user profile in mellow_users on login
+  useEffect(() => {
+    if (isFirebaseConnected && db && currentUser) {
+      const phoneClean = currentUser.phoneNumber || '+5491155559999';
+      get(ref(db, 'mellow_users')).then((snapshot) => {
+        const usersVal = snapshot.val();
+        let exists = false;
+        if (usersVal) {
+          exists = Object.values(usersVal).some((u: any) => u.phone === phoneClean);
+        }
+        if (!exists) {
+          const newKey = `user_${Date.now()}`;
+          set(ref(db, `mellow_users/${newKey}`), {
+            phone: phoneClean,
+            name: `Ciudadano ${phoneClean.slice(-4)}`,
+            role: 'Ciudadano',
+            status: 'Activo',
+            empathyScore: 1.0,
+            interceptedCount: 0
+          });
+        }
+      });
+    }
+  }, [currentUser, isFirebaseConnected]);
 
   // Aggregate metrics
   useEffect(() => {
@@ -283,6 +325,28 @@ export function useChatSync() {
 
     if (isFirebaseConnected && db) {
       await set(ref(db, `mellow_chats_v2/${activeRoomId}/messages/${messageId}`), newMsg);
+      
+      // Update empathy metrics dynamically in mellow_users node
+      if (currentUser) {
+        const cleanPhone = currentUser.phoneNumber || '+5491155559999';
+        get(ref(db, 'mellow_users')).then((snapshot) => {
+          const usersVal = snapshot.val();
+          if (usersVal) {
+            const userKey = Object.keys(usersVal).find(k => usersVal[k].phone.replace(/[\s\-\(\)]/g, '') === cleanPhone);
+            if (userKey) {
+              const user = usersVal[userKey];
+              const newCount = (user.interceptedCount || 0) + 1;
+              const msgToxicity = metadata?.toxicityLevel || 0;
+              const newEmpathy = Math.max(0.1, Math.min(1.0, user.empathyScore - (msgToxicity * 0.04) + 0.01));
+              
+              update(ref(db, `mellow_users/${userKey}`), {
+                interceptedCount: newCount,
+                empathyScore: parseFloat(newEmpathy.toFixed(2))
+              });
+            }
+          }
+        });
+      }
     } else {
       const updatedRooms = { ...rooms };
       if (!updatedRooms[activeRoomId].messages) {
@@ -347,6 +411,7 @@ export function useChatSync() {
     metrics,
     currentUser,
     authLoading,
+    users,
     sendMessage: handleSendMessage,
     sendProcessedMessage,
     createRoom,

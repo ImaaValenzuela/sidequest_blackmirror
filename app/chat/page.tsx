@@ -9,6 +9,8 @@ import ChatArea from '../../components/chat/ChatArea';
 import ContactInfoSidebar from '../../components/chat/ContactInfoSidebar';
 import InterceptionModal from '../../components/chat/InterceptionModal';
 import NewChatModal from '../../components/chat/NewChatModal';
+import AdminDashboard from '../../components/chat/AdminDashboard';
+import MellowLogo from '../../components/chat/MellowLogo';
 import { MessageSquare } from 'lucide-react';
 
 const profileConfig = {
@@ -47,6 +49,7 @@ export default function ChatPage() {
     metrics,
     currentUser,
     authLoading,
+    users,
     sendProcessedMessage,
     createRoom,
     changeRoomProfile,
@@ -61,6 +64,7 @@ export default function ChatPage() {
   const [interceptionText, setInterceptionText] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isNewChatOpen, setIsNewChatOpen] = useState<boolean>(false);
+  const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
 
   // Load user theme preference on mount
   useEffect(() => {
@@ -117,6 +121,8 @@ export default function ChatPage() {
         isAuditMode={isAuditMode}
         onToggleAuditMode={() => setIsAuditMode(!isAuditMode)}
         onLogout={logout}
+        onToggleAdmin={() => setIsAdminOpen(!isAdminOpen)}
+        isAdminActive={isAdminOpen}
       />
 
       {/* COLUMN 2: CHATS LIST */}
@@ -146,10 +152,11 @@ export default function ChatPage() {
         <div className={`flex-1 flex flex-col items-center justify-center text-center p-8 transition-colors ${
           isDarkMode ? 'bg-[#222e35]/10' : 'bg-[#f8f9fa]'
         }`}>
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
-            isDarkMode ? 'bg-[#2a3942] text-cyan-400' : 'bg-emerald-50 text-emerald-600'
-          }`}>
-            <MessageSquare size={32} />
+          <div className="mb-4">
+            <MellowLogo 
+              size={64} 
+              className={isDarkMode ? 'text-[#8696a0]' : 'text-[#aebac1]'} 
+            />
           </div>
           <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-[#e9edef]' : 'text-zinc-800'}`}>
             Mellow Middleware
@@ -191,6 +198,15 @@ export default function ChatPage() {
         onClose={() => setIsNewChatOpen(false)}
         isDarkMode={isDarkMode}
         onCreateChat={createRoom}
+      />
+
+      {/* ADMIN DASHBOARD PORTAL */}
+      <AdminDashboard
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        isDarkMode={isDarkMode}
+        users={users}
+        rooms={rooms}
       />
     </div>
   );

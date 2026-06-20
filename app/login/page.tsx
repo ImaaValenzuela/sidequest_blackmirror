@@ -8,7 +8,8 @@ import {
   onAuthStateChanged 
 } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
-import { ShieldCheck, MessageSquare, AlertCircle } from 'lucide-react';
+import { ShieldCheck, AlertCircle } from 'lucide-react';
+import MellowLogo from '../../components/chat/MellowLogo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -141,10 +142,11 @@ export default function LoginPage() {
         isDarkMode ? 'bg-[#222e35] border-[#2f3b43]' : 'bg-[#ffffff] border-zinc-200'
       }`}>
         <div className="flex flex-col items-center text-center mb-6">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3.5 ${
-            isDarkMode ? 'bg-[#2a3942] text-cyan-400' : 'bg-emerald-50 text-emerald-600'
-          }`}>
-            <MessageSquare size={24} />
+          <div className="mb-4">
+            <MellowLogo 
+              size={54} 
+              className={isDarkMode ? 'text-cyan-400' : 'text-[#00a884]'} 
+            />
           </div>
           <h1 className="text-xl font-bold tracking-tight">Middleware Mellow</h1>
           <p className={`text-[12.5px] mt-1 ${isDarkMode ? 'text-[#8696a0]' : 'text-[#667781]'}`}>

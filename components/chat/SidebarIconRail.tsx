@@ -19,6 +19,8 @@ interface SidebarIconRailProps {
   isAuditMode: boolean;
   onToggleAuditMode: () => void;
   onLogout?: () => void;
+  onToggleAdmin?: () => void;
+  isAdminActive?: boolean;
 }
 
 export default function SidebarIconRail({
@@ -26,7 +28,9 @@ export default function SidebarIconRail({
   onToggleTheme,
   isAuditMode,
   onToggleAuditMode,
-  onLogout
+  onLogout,
+  onToggleAdmin,
+  isAdminActive
 }: SidebarIconRailProps) {
   return (
     <div className={`w-[64px] border-r flex flex-col items-center justify-between py-4 shrink-0 transition-colors ${
@@ -48,9 +52,19 @@ export default function SidebarIconRail({
           <Compass size={22} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full"></span>
         </div>
-        <div className="p-2 hover:bg-[#374248] dark:hover:bg-[#374248] hover:bg-zinc-200 rounded-lg cursor-pointer transition-colors" title="Comunidades">
+        <button 
+          onClick={onToggleAdmin}
+          className={`p-2 rounded-lg cursor-pointer transition-colors ${
+            isAdminActive 
+              ? isDarkMode 
+                ? 'text-cyan-400 bg-[#374248]' 
+                : 'text-[#00a884] bg-[#e1e3e6]'
+              : 'hover:bg-[#374248] dark:hover:bg-[#374248] hover:bg-zinc-200'
+          }`} 
+          title="Consola de Control de Usuarios"
+        >
           <Users size={22} />
-        </div>
+        </button>
         <div className="p-2 hover:bg-[#374248] dark:hover:bg-[#374248] hover:bg-zinc-200 rounded-lg cursor-pointer transition-colors" title="Canales">
           <Volume2 size={22} />
         </div>

@@ -123,6 +123,7 @@ export default function ChatPage() {
         onLogout={logout}
         onToggleAdmin={() => setIsAdminOpen(!isAdminOpen)}
         isAdminActive={isAdminOpen}
+        totalUnread={Object.values(rooms).reduce((sum, r) => sum + (r.unreadCount || 0), 0)}
       />
 
       {/* COLUMN 2: CHATS LIST */}

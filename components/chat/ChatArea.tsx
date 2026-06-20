@@ -39,12 +39,17 @@ export default function ChatArea({
       isDarkMode ? 'bg-[#0b141a]' : 'bg-[#efeae2]'
     }`}>
       
-      {/* Repeating doodle SVG wallpaper */}
-      <div className={`absolute inset-0 pointer-events-none z-0 transition-opacity ${
-        isDarkMode 
-          ? 'opacity-[0.04] bg-[radial-gradient(#8696a0_1px,transparent_1px)] [background-size:20px_20px]' 
-          : 'opacity-[0.08] bg-[radial-gradient(#54656f_1px,transparent_1px)] [background-size:20px_20px]'
-      }`}></div>
+      {/* Repeating WhatsApp doodle wallpaper */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-0 transition-opacity"
+        style={{
+          backgroundImage: "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')",
+          backgroundSize: '400px',
+          backgroundRepeat: 'repeat',
+          opacity: isDarkMode ? 0.05 : 0.06,
+          filter: isDarkMode ? 'invert(1) opacity(0.5)' : 'none'
+        }}
+      ></div>
 
       {/* Chat Header */}
       <div className={`h-[60px] flex items-center justify-between px-4 z-10 border-b transition-colors ${

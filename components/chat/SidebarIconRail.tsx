@@ -21,6 +21,7 @@ interface SidebarIconRailProps {
   onLogout?: () => void;
   onToggleAdmin?: () => void;
   isAdminActive?: boolean;
+  totalUnread?: number;
 }
 
 export default function SidebarIconRail({
@@ -30,7 +31,8 @@ export default function SidebarIconRail({
   onToggleAuditMode,
   onLogout,
   onToggleAdmin,
-  isAdminActive
+  isAdminActive,
+  totalUnread = 0
 }: SidebarIconRailProps) {
   return (
     <div className={`w-[64px] border-r flex flex-col items-center justify-between py-4 shrink-0 transition-colors ${
@@ -38,8 +40,9 @@ export default function SidebarIconRail({
     }`}>
       {/* Top icons */}
       <div className="flex flex-col items-center gap-6 w-full">
+        {/* Chats Icon with Badge */}
         <div 
-          className={`p-2 rounded-lg cursor-pointer transition-colors ${
+          className={`p-2 rounded-lg cursor-pointer transition-colors relative ${
             isDarkMode 
               ? 'text-cyan-400 bg-[#374248]' 
               : 'text-[#00a884] bg-[#e1e3e6]'
@@ -47,11 +50,25 @@ export default function SidebarIconRail({
           title="Chats"
         >
           <MessageSquare size={22} />
+          {totalUnread > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 bg-[#00a884] text-[#111b21] dark:text-[#111b21] text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#f0f2f5] dark:border-[#202c33]">
+              {totalUnread}
+            </span>
+          )}
         </div>
+
+        {/* Status Icon */}
         <div className="p-2 hover:bg-[#374248] dark:hover:bg-[#374248] hover:bg-zinc-200 rounded-lg cursor-pointer transition-colors relative" title="Estado">
           <Compass size={22} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full"></span>
         </div>
+
+        {/* Channels Icon */}
+        <div className="p-2 hover:bg-[#374248] dark:hover:bg-[#374248] hover:bg-zinc-200 rounded-lg cursor-pointer transition-colors" title="Canales">
+          <Volume2 size={22} />
+        </div>
+
+        {/* Communities / Admin Toggle Icon */}
         <button 
           onClick={onToggleAdmin}
           className={`p-2 rounded-lg cursor-pointer transition-colors ${
@@ -65,9 +82,6 @@ export default function SidebarIconRail({
         >
           <Users size={22} />
         </button>
-        <div className="p-2 hover:bg-[#374248] dark:hover:bg-[#374248] hover:bg-zinc-200 rounded-lg cursor-pointer transition-colors" title="Canales">
-          <Volume2 size={22} />
-        </div>
       </div>
 
       {/* Bottom icons */}

@@ -3,7 +3,7 @@ const http = require('https');
 const FIREBASE_BASE = 'https://realtimechat-67f5c-default-rtdb.firebaseio.com';
 const MY_PHONE = '+5491155559999';
 
-// Localized mock chats highlighting Mellow's filter profiles
+// Argentinized mock chats highlighting Mellow's filter profiles
 const seedRooms = {
   "room_jefe": {
     "id": "room_jefe",
@@ -11,7 +11,7 @@ const seedRooms = {
     "phone": "+5491150321144",
     "avatar": "https://i.pravatar.cc/150?img=11",
     "profile": "corporate",
-    "lastMessage": "Reporte enviado por mail. Saludos.",
+    "lastMessage": "Dale, avisame cualquier cosa. Saludos.",
     "lastMessageTime": Date.now() - 3600000 * 1,
     "unreadCount": 0,
     "messages": {
@@ -19,7 +19,7 @@ const seedRooms = {
         "id": "msg_j_1",
         "senderId": "+5491150321144",
         "senderName": "Jefe de Proyecto 💼",
-        "text": "Buenos días, ¿tenés listos los accesos para el nuevo desarrollador?",
+        "text": "Che, ¿cómo andás? ¿Llegás a entregar el reporte de hoy o reprogramamos con el cliente?",
         "timestamp": Date.now() - 3600000 * 8,
         "status": "received"
       },
@@ -27,7 +27,7 @@ const seedRooms = {
         "id": "msg_j_2",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Hola. Sí, ya le envié las credenciales de GitHub y el acceso a la base de datos de pruebas.",
+        "text": "Hola. Sí, ya le pasé los accesos de GitHub al desarrollador nuevo y la base de datos de prueba está levantada.",
         "timestamp": Date.now() - 3600000 * 7,
         "status": "sent"
       },
@@ -35,7 +35,7 @@ const seedRooms = {
         "id": "msg_j_3",
         "senderId": "+5491150321144",
         "senderName": "Jefe de Proyecto 💼",
-        "text": "Perfecto. Recordá que a la tarde tenemos la demo con el cliente del exterior.",
+        "text": "Buenísimo. Acordate que a la tarde tenemos la demo con los clientes de afuera.",
         "timestamp": Date.now() - 3600000 * 6,
         "status": "received"
       },
@@ -43,7 +43,7 @@ const seedRooms = {
         "id": "msg_j_4",
         "senderId": "+5491150321144",
         "senderName": "Jefe de Proyecto 💼",
-        "text": "¿Hola? ¿Vas a llegar a entregar el reporte de hoy o tenemos que reprogramar con el cliente?",
+        "text": "¿Che, estás ahí? ¿Terminás el reporte de métricas hoy o se nos cae la presentación?",
         "timestamp": Date.now() - 3600000 * 4,
         "status": "received"
       },
@@ -52,14 +52,14 @@ const seedRooms = {
         "senderId": MY_PHONE,
         "senderName": "Tú",
         "text": "Hola. Comprendo la importancia del reporte para el cliente. Estoy priorizando esta tarea para asegurar una entrega óptima a la brevedad.",
-        "originalText": "La verdad que me tienen cansado con sus urgencias de último minuto, dejen de cambiar las fechas.",
+        "originalText": "La verdad que me tienen podrido con las urgencias a último momento, dejen de cambiar las fechas a cada rato que es un quilombo.",
         "timestamp": Date.now() - 3600000 * 3,
         "status": "filtered",
         "toxicityLevel": 0.82,
         "originalToxicity": 0.82,
         "metadata": {
           "modelUsed": "gpt-4o-mini",
-          "originalWordsCount": 14,
+          "originalWordsCount": 20,
           "filteredWordsCount": 18,
           "delayMs": 480
         }
@@ -88,7 +88,7 @@ const seedRooms = {
     "phone": "+5491138224911",
     "avatar": "https://i.pravatar.cc/150?img=32",
     "profile": "couple",
-    "lastMessage": "Llegando a casa en 10 minutos. Poné la pava.",
+    "lastMessage": "Dale, llego a casa en 10 minutos. Poné la pava para unos mates.",
     "lastMessageTime": Date.now() - 1200000,
     "unreadCount": 0,
     "messages": {
@@ -96,7 +96,7 @@ const seedRooms = {
         "id": "msg_a_1",
         "senderId": "+5491138224911",
         "senderName": "Mi Amor 💕",
-        "text": "Hola, ¿cómo vas con tu día? ¿Te acordaste de comprar las cosas para la cena?",
+        "text": "Hola lindo, ¿cómo va tu día? ¿Te acordaste de comprar las cosas para la cena de esta noche?",
         "timestamp": Date.now() - 3600000 * 10,
         "status": "received"
       },
@@ -104,7 +104,7 @@ const seedRooms = {
         "id": "msg_a_2",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Hola mi vida, sí, ya salgo de la oficina y paso por el súper. ¿Falta algo más aparte de la verdura?",
+        "text": "Hola gordi, sí, ya salgo del laburo y paso por el súper. ¿Falta algo más aparte de la verdura?",
         "timestamp": Date.now() - 3600000 * 9,
         "status": "sent"
       },
@@ -120,7 +120,7 @@ const seedRooms = {
         "id": "msg_a_4",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Dale, agendado. Nos vemos en un rato.",
+        "text": "Dale, ya me lo anoté. Nos vemos en un ratito.",
         "timestamp": Date.now() - 3600000 * 7,
         "status": "sent"
       },
@@ -128,7 +128,7 @@ const seedRooms = {
         "id": "msg_a_5",
         "senderId": "+5491138224911",
         "senderName": "Mi Amor 💕",
-        "text": "¿Por qué no respondes los mensajes? Siempre hacés lo mismo cuando te enojás.",
+        "text": "¿Por qué no me contestás los mensajes? Siempre hacés la misma cuando te enojás, che.",
         "timestamp": Date.now() - 3600000 * 3,
         "status": "received"
       },
@@ -136,15 +136,15 @@ const seedRooms = {
         "id": "msg_a_6",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Hola cariño. Lamento no haber respondido antes, a veces me cuesta encontrar las palabras correctas cuando tenemos diferencias. Te quiero mucho.",
-        "originalText": "No respondo porque decís puras tonterías y no te soporto cuando te ponés así.",
+        "text": "Hola gordi. Perdón por colgarme y no contestar antes, a veces me cuesta encontrar las palabras correctas cuando discutimos. Te amo mucho.",
+        "originalText": "No te contesto porque decís cualquiera y no te soporto cuando te ponés así de pesada.",
         "timestamp": Date.now() - 3600000 * 2,
         "status": "filtered",
         "toxicityLevel": 0.94,
         "originalToxicity": 0.94,
         "metadata": {
           "modelUsed": "gpt-4o-mini",
-          "originalWordsCount": 13,
+          "originalWordsCount": 14,
           "filteredWordsCount": 21,
           "delayMs": 520
         }
@@ -153,7 +153,7 @@ const seedRooms = {
         "id": "msg_a_7",
         "senderId": "+5491138224911",
         "senderName": "Mi Amor 💕",
-        "text": "Gracias por decirlo así, yo también te quiero y quiero que estemos bien. Hablemos cuando llegues.",
+        "text": "Gracias por decirlo así, yo también te amo y quiero que estemos bien. Charlamos tranquilos cuando llegues.",
         "timestamp": Date.now() - 3600000 * 1,
         "status": "received"
       },
@@ -161,7 +161,7 @@ const seedRooms = {
         "id": "msg_a_8",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Llegando a casa en 10 minutos. Poné la pava.",
+        "text": "Dale, llego a casa en 10 minutos. Poné la pava para unos mates.",
         "timestamp": Date.now() - 1200000,
         "status": "sent"
       }
@@ -173,7 +173,7 @@ const seedRooms = {
     "phone": "+5491149876543",
     "avatar": "https://i.pravatar.cc/150?img=47",
     "profile": "family",
-    "lastMessage": "¡Buenísimo ma! Llevo el postre. Beso grande.",
+    "lastMessage": "¡Buenísimo ma! Llevo unas facturas. Beso grande.",
     "lastMessageTime": Date.now() - 1500000,
     "unreadCount": 0,
     "messages": {
@@ -181,7 +181,7 @@ const seedRooms = {
         "id": "msg_m_1",
         "senderId": "+5491149876543",
         "senderName": "Mamá 🙏",
-        "text": "Hola hijito, ¿cómo estás de salud? ¿Te estás abrigando?",
+        "text": "Hola hijito, ¿cómo estás? ¿Te estás abrigando bien que hace un frío bárbaro?",
         "timestamp": Date.now() - 3600000 * 24,
         "status": "received"
       },
@@ -189,7 +189,7 @@ const seedRooms = {
         "id": "msg_m_2",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Hola ma, todo bien por suerte, sí, hace frío pero ando con campera. ¿Ustedes cómo están?",
+        "text": "Hola ma, todo de diez por suerte, sí, está helado pero ando abrigado. ¿Ustedes cómo andan?",
         "timestamp": Date.now() - 3600000 * 23,
         "status": "sent"
       },
@@ -197,7 +197,7 @@ const seedRooms = {
         "id": "msg_m_3",
         "senderId": "+5491149876543",
         "senderName": "Mamá 🙏",
-        "text": "Acá bien, papá con un poco de tos pero nada grave. Acordate de llamarlo para su cumpleaños.",
+        "text": "Acá bien, papá anda con un poco de tos pero nada grave. Acordate de llamarlo para su cumple.",
         "timestamp": Date.now() - 3600000 * 20,
         "status": "received"
       },
@@ -205,7 +205,7 @@ const seedRooms = {
         "id": "msg_m_4",
         "senderId": "+5491149876543",
         "senderName": "Mamá 🙏",
-        "text": "Hijo, ¿vas a venir a cenar el domingo? Hace tres semanas que no te vemos.",
+        "text": "Hijo, ¿vas a venir a comer el domingo? Hace como tres semanas que no te vemos, che.",
         "timestamp": Date.now() - 3600000 * 3,
         "status": "received"
       },
@@ -213,15 +213,15 @@ const seedRooms = {
         "id": "msg_m_5",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Hola mamá. Lamento no haber estado tan presente últimamente debido a mis compromisos laborales. Me encantaría verlos este domingo.",
-        "originalText": "Estoy ocupado con mis cosas, no me rompan las bolas con las cenas familiares.",
+        "text": "Hola ma. Lamento no haber estado tan presente últimamente debido al laburo. Me encantaría ir a almorzar con ustedes este domingo.",
+        "originalText": "Estoy a mil con mis cosas, no me rompan las bolas con los almuerzos familiares de los domingos.",
         "timestamp": Date.now() - 3600000 * 2,
         "status": "filtered",
         "toxicityLevel": 0.78,
         "originalToxicity": 0.78,
         "metadata": {
           "modelUsed": "gpt-4o-mini",
-          "originalWordsCount": 12,
+          "originalWordsCount": 15,
           "filteredWordsCount": 19,
           "delayMs": 410
         }
@@ -230,7 +230,7 @@ const seedRooms = {
         "id": "msg_m_6",
         "senderId": "+5491149876543",
         "senderName": "Mamá 🙏",
-        "text": "Qué alegría hijo, te preparamos tu comida favorita. Cuidate mucho.",
+        "text": "Qué alegría hijo, te preparamos un asadito y flan casero. Cuidate mucho.",
         "timestamp": Date.now() - 3600000 * 1,
         "status": "received"
       },
@@ -238,7 +238,7 @@ const seedRooms = {
         "id": "msg_m_7",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "¡Buenísimo ma! Llevo el postre. Beso grande.",
+        "text": "¡Buenísimo ma! Llevo unas facturas. Beso grande.",
         "timestamp": Date.now() - 1500000,
         "status": "sent"
       }
@@ -250,7 +250,7 @@ const seedRooms = {
     "phone": "+5491161129876",
     "avatar": "https://i.pravatar.cc/150?img=59",
     "profile": "corporate",
-    "lastMessage": "Avisame qué te dice apenas salgas de la reunión.",
+    "lastMessage": "Dale, avisame qué te dice apenas salgas de la reunión.",
     "lastMessageTime": Date.now() - 300000,
     "unreadCount": 0,
     "messages": {
@@ -258,7 +258,7 @@ const seedRooms = {
         "id": "msg_s_1",
         "senderId": "+5491161129876",
         "senderName": "Socio Comercial 💼",
-        "text": "Hola, ¿viste la propuesta del nuevo diseño UX?",
+        "text": "Che, ¿viste la propuesta del nuevo diseño UX? ¿Qué te pareció?",
         "timestamp": Date.now() - 3600000 * 12,
         "status": "received"
       },
@@ -266,7 +266,7 @@ const seedRooms = {
         "id": "msg_s_2",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Sí, me gustó bastante. Creo que es más limpio y se adapta mejor al mobile.",
+        "text": "Sí, la miré. Me pareció re limpia y en el celu se ve bárbara.",
         "timestamp": Date.now() - 3600000 * 11,
         "status": "sent"
       },
@@ -274,7 +274,7 @@ const seedRooms = {
         "id": "msg_s_3",
         "senderId": "+5491161129876",
         "senderName": "Socio Comercial 💼",
-        "text": "El inversor está dudando sobre el presupuesto que pasamos. Hay que bajar los números.",
+        "text": "Che, el inversor está dando vueltas con el presupuesto que pasamos. Hay que bajar los números sí o sí.",
         "timestamp": Date.now() - 3600000 * 3,
         "status": "received"
       },
@@ -283,14 +283,14 @@ const seedRooms = {
         "senderId": MY_PHONE,
         "senderName": "Tú",
         "text": "Entiendo su postura. Podemos analizar optimizaciones en el alcance del proyecto para alinear el presupuesto con sus expectativas sin comprometer el estándar de calidad.",
-        "originalText": "Dile al inversor que no sea tan tacaño, el desarrollo de software de calidad cuesta plata.",
+        "originalText": "Decile al inversor que deje de ratear, el desarrollo de software de calidad cuesta guita y no lo regalamos.",
         "timestamp": Date.now() - 3600000 * 2,
         "status": "filtered",
         "toxicityLevel": 0.85,
         "originalToxicity": 0.85,
         "metadata": {
           "modelUsed": "gpt-4o-mini",
-          "originalWordsCount": 13,
+          "originalWordsCount": 16,
           "filteredWordsCount": 22,
           "delayMs": 490
         }
@@ -299,7 +299,7 @@ const seedRooms = {
         "id": "msg_s_5",
         "senderId": "+5491161129876",
         "senderName": "Socio Comercial 💼",
-        "text": "Perfecto, le presento esta propuesta de optimización por la tarde.",
+        "text": "De una, le presento esta propuesta de optimización a la tarde.",
         "timestamp": Date.now() - 3600000 * 1,
         "status": "received"
       },
@@ -307,7 +307,7 @@ const seedRooms = {
         "id": "msg_s_6",
         "senderId": MY_PHONE,
         "senderName": "Tú",
-        "text": "Avisame qué te dice apenas salgas de la reunión.",
+        "text": "Dale, avisame qué te dice apenas salgas de la reunión. Abrazo.",
         "timestamp": Date.now() - 300000,
         "status": "sent"
       }

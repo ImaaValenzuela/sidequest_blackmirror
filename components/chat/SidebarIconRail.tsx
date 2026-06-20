@@ -9,7 +9,8 @@ import {
   Terminal, 
   Settings, 
   Sun, 
-  Moon 
+  Moon,
+  LogOut
 } from 'lucide-react';
 
 interface SidebarIconRailProps {
@@ -17,13 +18,15 @@ interface SidebarIconRailProps {
   onToggleTheme: () => void;
   isAuditMode: boolean;
   onToggleAuditMode: () => void;
+  onLogout?: () => void;
 }
 
 export default function SidebarIconRail({
   isDarkMode,
   onToggleTheme,
   isAuditMode,
-  onToggleAuditMode
+  onToggleAuditMode,
+  onLogout
 }: SidebarIconRailProps) {
   return (
     <div className={`w-[64px] border-r flex flex-col items-center justify-between py-4 shrink-0 transition-colors ${
@@ -81,6 +84,13 @@ export default function SidebarIconRail({
         <div className="p-2 hover:bg-[#374248] dark:hover:bg-[#374248] hover:bg-zinc-200 rounded-lg cursor-pointer transition-colors" title="Configuración">
           <Settings size={22} />
         </div>
+        <button 
+          onClick={onLogout}
+          className="p-2 hover:bg-[#374248] dark:hover:bg-[#374248] hover:bg-zinc-200 rounded-lg cursor-pointer text-rose-500 transition-colors"
+          title="Cerrar Sesión"
+        >
+          <LogOut size={22} />
+        </button>
         <img 
           src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" 
           alt="User profile" 

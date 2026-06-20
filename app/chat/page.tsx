@@ -1,11 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useChatSync } from '../../hooks/useChatSync';
 import SidebarIconRail from '../../components/chat/SidebarIconRail';
 import ChatListSidebar from '../../components/chat/ChatListSidebar';
 import ChatArea from '../../components/chat/ChatArea';
 import ContactInfoSidebar from '../../components/chat/ContactInfoSidebar';
+import InterceptionModal from '../../components/chat/InterceptionModal';
+import NewChatModal from '../../components/chat/NewChatModal';
+import { MessageSquare } from 'lucide-react';
 
 const profileConfig = {
   couple: {
@@ -32,6 +36,7 @@ const profileConfig = {
 };
 
 export default function ChatPage() {
+  const router = useRouter();
   const {
     activeRoomId,
     setActiveRoomId,
@@ -40,13 +45,22 @@ export default function ChatPage() {
     isFirebaseConnected,
     isSending,
     metrics,
-    sendMessage,
-    changeRoomProfile
+    currentUser,
+    authLoading,
+    sendProcessedMessage,
+    createRoom,
+    changeRoomProfile,
+    logout
   } = useChatSync();
 
   const [isAuditMode, setIsAuditMode] = useState<boolean>(true);
   const [isInfoOpen, setIsInfoOpen] = useState<boolean>(true);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+
+  // Modal states
+  const [interceptionText, setInterceptionText] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isNewChatOpen, setIsNewChatOpen] = useState<boolean>(false);
 
   // Load user theme preference on mount
   useEffect(() => {
@@ -56,17 +70,42 @@ export default function ChatPage() {
     }
   }, []);
 
+  // Redirect to login if user is not authenticated
+  useEffect(() => {
+    if (!authLoading && !currentUser) {
+      router.push('/login');
+    }
+  }, [currentUser, authLoading, router]);
+
   const toggleTheme = () => {
     const nextTheme = !isDarkMode;
     setIsDarkMode(nextTheme);
     localStorage.setItem('mellow_theme', nextTheme ? 'dark' : 'light');
   };
 
+  const handleInterceptSendMessage = (text: string) => {
+    setInterceptionText(text);
+    setIsModalOpen(true);
+  };
+
+  if (authLoading) {
+    return (
+      <div className="w-screen h-screen flex flex-col items-center justify-center bg-[#0c1317] text-[#e9edef] font-mono">
+        <div className="w-10 h-10 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-xs tracking-widest uppercase">Verificando Credenciales de Convivencia...</p>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return null; // Will trigger router redirect
+  }
+
   const currentRoom = rooms[activeRoomId];
 
   return (
     <div 
-      className={`flex h-screen w-screen overflow-hidden select-none text-[14px] transition-colors duration-150 ${
+      className={`relative flex h-screen w-screen overflow-hidden select-none text-[14px] transition-colors duration-150 ${
         isDarkMode ? 'bg-[#0c1317] text-[#e9edef]' : 'bg-[#eae6df] text-[#111b21]'
       }`}
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' }}
@@ -77,6 +116,7 @@ export default function ChatPage() {
         onToggleTheme={toggleTheme}
         isAuditMode={isAuditMode}
         onToggleAuditMode={() => setIsAuditMode(!isAuditMode)}
+        onLogout={logout}
       />
 
       {/* COLUMN 2: CHATS LIST */}
@@ -87,20 +127,37 @@ export default function ChatPage() {
         isFirebaseConnected={isFirebaseConnected}
         isDarkMode={isDarkMode}
         profileConfig={profileConfig}
+        onNewChat={() => setIsNewChatOpen(true)}
       />
 
-      {/* COLUMN 3: ACTIVE CHAT WINDOW */}
-      {currentRoom && (
+      {/* COLUMN 3: ACTIVE CHAT WINDOW / EMPTY PLACEHOLDER */}
+      {currentRoom ? (
         <ChatArea
           room={currentRoom}
           messages={messages}
           isAuditMode={isAuditMode}
           isDarkMode={isDarkMode}
           isSending={isSending}
-          onSendMessage={sendMessage}
+          onSendMessage={handleInterceptSendMessage}
           onToggleInfo={() => setIsInfoOpen(!isInfoOpen)}
           onToggleAuditMode={() => setIsAuditMode(!isAuditMode)}
         />
+      ) : (
+        <div className={`flex-1 flex flex-col items-center justify-center text-center p-8 transition-colors ${
+          isDarkMode ? 'bg-[#222e35]/10' : 'bg-[#f8f9fa]'
+        }`}>
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${
+            isDarkMode ? 'bg-[#2a3942] text-cyan-400' : 'bg-emerald-50 text-emerald-600'
+          }`}>
+            <MessageSquare size={32} />
+          </div>
+          <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-[#e9edef]' : 'text-zinc-800'}`}>
+            Mellow Middleware
+          </h2>
+          <p className={`text-xs mt-1.5 max-w-xs leading-normal ${isDarkMode ? 'text-[#8696a0]' : 'text-[#667781]'}`}>
+            Sincronización segura y control de armonía activo. Haz clic en el botón "+" para iniciar un nuevo chat y comenzar.
+          </p>
+        </div>
       )}
 
       {/* COLUMN 4: CONTACT INFO SIDEBAR */}
@@ -114,6 +171,27 @@ export default function ChatPage() {
           profileConfig={profileConfig}
         />
       )}
+
+      {/* INTERCEPTION MODAL */}
+      <InterceptionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        originalText={interceptionText}
+        activeProfile={currentRoom?.profile || 'couple'}
+        isDarkMode={isDarkMode}
+        onConfirmSend={(finalText, original, status, meta) => {
+          sendProcessedMessage(finalText, original, status, meta);
+          setIsModalOpen(false);
+        }}
+      />
+
+      {/* NEW CHAT MODAL */}
+      <NewChatModal
+        isOpen={isNewChatOpen}
+        onClose={() => setIsNewChatOpen(false)}
+        isDarkMode={isDarkMode}
+        onCreateChat={createRoom}
+      />
     </div>
   );
 }

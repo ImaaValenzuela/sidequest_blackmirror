@@ -12,6 +12,7 @@ interface ChatListSidebarProps {
   isFirebaseConnected: boolean;
   isDarkMode: boolean;
   profileConfig: Record<string, { emoji: string }>;
+  onNewChat?: () => void;
 }
 
 export default function ChatListSidebar({
@@ -20,7 +21,8 @@ export default function ChatListSidebar({
   onSelectRoom,
   isFirebaseConnected,
   isDarkMode,
-  profileConfig
+  profileConfig,
+  onNewChat
 }: ChatListSidebarProps) {
   return (
     <div className={`w-[390px] min-w-[340px] flex flex-col border-r shrink-0 transition-colors ${
@@ -34,7 +36,11 @@ export default function ChatListSidebar({
             Chats
           </h1>
           <div className="flex items-center gap-3 text-[#aebac1] dark:text-[#aebac1] text-[#54656f]">
-            <div className="p-1.5 hover:bg-[#202c33] dark:hover:bg-[#202c33] hover:bg-zinc-100 rounded-full cursor-pointer transition-colors">
+            <div 
+              onClick={onNewChat}
+              className="p-1.5 hover:bg-[#202c33] dark:hover:bg-[#202c33] hover:bg-zinc-100 rounded-full cursor-pointer transition-colors"
+              title="Nuevo Chat"
+            >
               <Plus size={20} />
             </div>
             <div className="p-1.5 hover:bg-[#202c33] dark:hover:bg-[#202c33] hover:bg-zinc-100 rounded-full cursor-pointer transition-colors">

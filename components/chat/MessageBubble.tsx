@@ -29,7 +29,9 @@ export default function MessageBubble({
             ? isFiltering 
               ? 'bg-cyan-950 border border-cyan-800/60 rounded-lg rounded-tr-none animate-pulse text-[#e9edef]' 
               : isFailed
-                ? 'bg-red-950/60 border border-red-800/40 rounded-lg rounded-tr-none text-[#e9edef]'
+                ? isDarkMode
+                  ? 'bg-red-950/60 border border-red-800/40 rounded-lg rounded-tr-none text-[#e9edef]'
+                  : 'bg-red-50 border border-red-200 rounded-lg rounded-tr-none text-red-700 font-medium'
                 : isDarkMode 
                   ? 'bg-[#005c4b] rounded-lg rounded-tr-none text-[#e9edef]' 
                   : 'bg-[#d9fdd3] rounded-lg rounded-tr-none text-[#111b21]'

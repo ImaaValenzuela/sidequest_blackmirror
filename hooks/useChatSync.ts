@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { ref, onValue, set, update, get } from 'firebase/database';
-import { db } from '../lib/firebase';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { db, auth } from '../lib/firebase';
 
 export interface Message {
   id: string;
@@ -28,159 +29,36 @@ export interface Room {
   unreadCount?: number;
 }
 
-const SEED_DATA: Record<string, Room> = {
-  'room-1': {
-    id: 'room-1',
-    name: 'Mi Amor 💔',
-    avatar: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=150&auto=format&fit=crop&q=80',
-    profile: 'couple',
-    statusText: 'en línea',
-    phone: '+54 9 11 5555-4321',
-    unreadCount: 0,
-    messages: [
-      {
-        id: 'msg-1-1',
-        sender: 'other',
-        text: 'Hola mi amor, ¿sabes a qué hora regresas? El perrito te extraña para dar su paseo. Te esperamos con mucho amor en casa. 💕',
-        originalText: 'Hola. ¿A qué hora pensás venir? El perro no se pasea solo.',
-        status: 'filtered',
-        timestamp: Date.now() - 3600000 * 2,
-        profile: 'couple',
-        toxicityLevel: 0.65,
-        originalTone: 'Quejoso y demandante',
-        savedMetric: 'Evitó 2 horas de discusión por tareas del hogar.'
-      },
-      {
-        id: 'msg-1-2',
-        sender: 'me',
-        text: 'Hola hermosa, estoy terminando unos pendientes importantes de trabajo para poder liberarme temprano y estar contigo. Te mando un beso gigante. ❤️',
-        originalText: 'Estoy laburando, no me rompas las pelotas.',
-        status: 'filtered',
-        timestamp: Date.now() - 3600000,
-        profile: 'couple',
-        toxicityLevel: 0.88,
-        originalTone: 'Agresivo y hostil',
-        savedMetric: 'Evitó un fin de semana completo de silencio glacial.'
-      }
-    ]
-  },
-  'room-2': {
-    id: 'room-2',
-    name: 'Jefe de Proyecto 💼',
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
-    profile: 'corporate',
-    statusText: 'Escribiendo...',
-    phone: '+54 9 11 9876-5432',
-    unreadCount: 1,
-    messages: [
-      {
-        id: 'msg-2-1',
-        sender: 'other',
-        text: 'Apreciado equipo, sugiero alinear nuestras agendas para revisar el progreso actual y asegurar que alcancemos los objetivos del sprint de manera colaborativa.',
-        originalText: 'El commit de ayer rompió todo el build de staging si siguen subiendo código basura sin testear.',
-        status: 'filtered',
-        timestamp: Date.now() - 3600000 * 5,
-        profile: 'corporate',
-        toxicityLevel: 0.78,
-        originalTone: 'Pasivo-agresivo e inculpador',
-        savedMetric: 'Previno pánico en el canal de Slack y 4 renuncias de juniors.'
-      },
-      {
-        id: 'msg-2-2',
-        sender: 'me',
-        text: 'Agradezco el feedback. Procedo a realizar una revisión detallada del pipeline y coordinaré las correcciones necesarias de manera inmediata para optimizar la estabilidad del producto.',
-        originalText: 'No es mi culpa que el deployer esté roto, revisen su config de mierda.',
-        status: 'filtered',
-        timestamp: Date.now() - 3600000 * 4,
-        profile: 'corporate',
-        toxicityLevel: 0.85,
-        originalTone: 'A la defensiva e irritable',
-        savedMetric: 'Evitó una reunión de emergencia de 3 horas y un descuento salarial.'
-      }
-    ]
-  },
-  'room-3': {
-    id: 'room-3',
-    name: 'Mamá 👵',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-    profile: 'family',
-    statusText: 'últ. vez hoy a las 17:45',
-    phone: '+54 9 11 4444-8888',
-    unreadCount: 0,
-    messages: [
-      {
-        id: 'msg-3-1',
-        sender: 'other',
-        text: 'Hola hijito, espero que estés muy bien. ¿Cuándo vas a venir a visitarnos? Nos harías muy felices si vienes a almorzar el domingo. 🙏😊',
-        originalText: 'Nunca llamás, parece que te olvidaste de que tenés familia.',
-        status: 'filtered',
-        timestamp: Date.now() - 3600000 * 10,
-        profile: 'family',
-        toxicityLevel: 0.7,
-        originalTone: 'Generador de culpa',
-        savedMetric: 'Evitó una llamada telefónica de 45 minutos de reproches.'
-      }
-    ]
-  },
-  'room-4': {
-    id: 'room-4',
-    name: 'Grupo Consorcio 🏢',
-    avatar: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?w=150&auto=format&fit=crop&q=80',
-    profile: 'family',
-    statusText: 'Grupo • 45 participantes',
-    phone: 'Consorcio Edificio 4B',
-    unreadCount: 3,
-    messages: [
-      {
-        id: 'msg-4-1',
-        sender: 'other',
-        text: 'Estimados vecinos, recuerden que de acuerdo a las normativas vigentes, el mantenimiento de los espacios comunes garantiza la armonía de nuestro edificio. Agradecemos su colaboración.',
-        originalText: 'Alguien dejó una bolsa de basura goteando en el ascensor. Son unos mugrientos maleducados.',
-        status: 'filtered',
-        timestamp: Date.now() - 3600000 * 12,
-        profile: 'family',
-        toxicityLevel: 0.8,
-        originalTone: 'Enojado y hostil',
-        savedMetric: 'Previno una guerra pasivo-agresiva en la cartelera del hall.'
-      }
-    ]
-  },
-  'room-5': {
-    id: 'room-5',
-    name: 'Soporte Técnico 🛠️',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
-    profile: 'corporate',
-    statusText: 'en línea',
-    phone: '+1 (800) 555-0199',
-    unreadCount: 0,
-    messages: [
-      {
-        id: 'msg-5-1',
-        sender: 'other',
-        text: 'Buenas tardes. Le informamos que estamos realizando una mantención proactiva en su nodo de red para asegurar los más altos niveles de disponibilidad de ancho de banda. Quedamos a su servicio.',
-        originalText: 'Se va a cortar internet por 2 horas porque tenemos que cambiar unos cables rotos.',
-        status: 'filtered',
-        timestamp: Date.now() - 3600000 * 24,
-        profile: 'corporate',
-        toxicityLevel: 0.5,
-        originalTone: 'Cortante e informativo',
-        savedMetric: 'Evitó reclamos masivos por chat y llamadas al call center.'
-      }
-    ]
-  }
-};
+// Empty baseline for fully dynamic real-time data
+const SEED_DATA: Record<string, Room> = {};
 
 export function useChatSync() {
-  const [activeRoomId, setActiveRoomId] = useState<string>('room-1');
+  const [activeRoomId, setActiveRoomId] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [rooms, setRooms] = useState<Record<string, Room>>(SEED_DATA);
+  const [rooms, setRooms] = useState<Record<string, Room>>({});
   const [isFirebaseConnected, setIsFirebaseConnected] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
+  
   const [metrics, setMetrics] = useState({
-    avoidedFights: 14,
-    avgToxicity: 0.72,
-    modifiedCount: 8,
+    avoidedFights: 0,
+    avgToxicity: 0,
+    modifiedCount: 0,
   });
+
+  // Track Firebase Auth state
+  useEffect(() => {
+    if (!auth) {
+      setAuthLoading(false);
+      return;
+    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Check if Firebase is properly configured
   useEffect(() => {
@@ -205,8 +83,21 @@ export function useChatSync() {
     }
   }, []);
 
-  // Sync rooms and messages from Firebase or local state
+  // Auto-select first room when rooms list loads and none is active
   useEffect(() => {
+    const roomKeys = Object.keys(rooms);
+    if (roomKeys.length > 0 && !activeRoomId) {
+      setActiveRoomId(roomKeys[0]);
+    }
+  }, [rooms, activeRoomId]);
+
+  // Sync active room messages from Firebase or local state
+  useEffect(() => {
+    if (!activeRoomId) {
+      setMessages([]);
+      return;
+    }
+
     if (isFirebaseConnected && db) {
       const roomRef = ref(db, `mellow_chats_v2/${activeRoomId}/messages`);
       const unsubscribe = onValue(roomRef, (snapshot) => {
@@ -223,19 +114,28 @@ export function useChatSync() {
     } else {
       const activeRoom = rooms[activeRoomId];
       if (activeRoom) {
-        setMessages(activeRoom.messages || []);
+        setMessages(activeRoom.messages ? Object.values(activeRoom.messages) : []);
       }
     }
   }, [activeRoomId, rooms, isFirebaseConnected]);
 
-  // Sync structural changes of rooms (e.g. profiles) from Firebase
+  // Sync structural changes of rooms from Firebase
   useEffect(() => {
     if (isFirebaseConnected && db) {
       const rootRef = ref(db, 'mellow_chats_v2');
       const unsubscribe = onValue(rootRef, (snapshot) => {
         const val = snapshot.val();
         if (val) {
-          setRooms(val);
+          // Normalize messages format if it's stored as map
+          const normalizedRooms = { ...val };
+          Object.keys(normalizedRooms).forEach(key => {
+            if (normalizedRooms[key].messages && !Array.isArray(normalizedRooms[key].messages)) {
+              normalizedRooms[key].messages = Object.values(normalizedRooms[key].messages);
+            }
+          });
+          setRooms(normalizedRooms);
+        } else {
+          setRooms({});
         }
       });
       return () => unsubscribe();
@@ -249,19 +149,22 @@ export function useChatSync() {
     let originalCount = 0;
 
     Object.values(rooms).forEach((room) => {
-      room.messages?.forEach((msg) => {
-        if (msg.status === 'filtered') {
-          filteredCount++;
-          if (msg.toxicityLevel) {
-            totalToxicity += msg.toxicityLevel;
-            originalCount++;
+      if (room.messages) {
+        const msgList = (Array.isArray(room.messages) ? room.messages : Object.values(room.messages)) as Message[];
+        msgList.forEach((msg) => {
+          if (msg.status === 'filtered') {
+            filteredCount++;
+            if (msg.toxicityLevel) {
+              totalToxicity += msg.toxicityLevel;
+              originalCount++;
+            }
           }
-        }
-      });
+        });
+      }
     });
 
-    const calculatedAvgToxicity = originalCount > 0 ? totalToxicity / originalCount : 0.72;
-    const calculatedAvoided = filteredCount + 6; // Baseline
+    const calculatedAvgToxicity = originalCount > 0 ? totalToxicity / originalCount : 0;
+    const calculatedAvoided = filteredCount;
 
     setMetrics({
       avoidedFights: calculatedAvoided,
@@ -271,7 +174,7 @@ export function useChatSync() {
   }, [rooms, messages]);
 
   const handleSendMessage = async (textToSend: string) => {
-    if (!textToSend.trim() || isSending) return;
+    if (!activeRoomId || !textToSend.trim() || isSending) return;
     setIsSending(true);
 
     const targetProfile = rooms[activeRoomId].profile;
@@ -291,7 +194,10 @@ export function useChatSync() {
       await set(ref(db, `mellow_chats_v2/${activeRoomId}/messages/${messageId}`), newMsg);
     } else {
       const updatedRooms = { ...rooms };
-      updatedRooms[activeRoomId].messages = [...(updatedRooms[activeRoomId].messages || []), newMsg];
+      if (!updatedRooms[activeRoomId].messages) {
+        updatedRooms[activeRoomId].messages = [];
+      }
+      updatedRooms[activeRoomId].messages.push(newMsg);
       setRooms(updatedRooms);
       localStorage.setItem('mellow_rooms_v2', JSON.stringify(updatedRooms));
     }
@@ -355,6 +261,63 @@ export function useChatSync() {
     }
   };
 
+  const sendProcessedMessage = async (
+    text: string, 
+    originalText?: string, 
+    status: 'filtered' | 'failed' = 'filtered',
+    metadata?: { toxicityLevel?: number; originalTone?: string; savedMetric?: string }
+  ) => {
+    if (!activeRoomId) return;
+    const targetProfile = rooms[activeRoomId].profile;
+    const messageId = `msg-${Date.now()}`;
+    const newMsg: Message = {
+      id: messageId,
+      sender: 'me',
+      text,
+      originalText,
+      status,
+      timestamp: Date.now(),
+      profile: targetProfile,
+      ...metadata
+    };
+
+    if (isFirebaseConnected && db) {
+      await set(ref(db, `mellow_chats_v2/${activeRoomId}/messages/${messageId}`), newMsg);
+    } else {
+      const updatedRooms = { ...rooms };
+      if (!updatedRooms[activeRoomId].messages) {
+        updatedRooms[activeRoomId].messages = [];
+      }
+      updatedRooms[activeRoomId].messages.push(newMsg);
+      setRooms(updatedRooms);
+      localStorage.setItem('mellow_rooms_v2', JSON.stringify(updatedRooms));
+    }
+  };
+
+  const createRoom = async (name: string, phone: string, profile: 'couple' | 'family' | 'corporate') => {
+    const roomId = `room-${Date.now()}`;
+    // Fetch a nice diverse set of contact avatars dynamically
+    const avatarSeed = Math.floor(Math.random() * 70);
+    const newRoom: Room = {
+      id: roomId,
+      name,
+      avatar: `https://i.pravatar.cc/150?img=${avatarSeed}`,
+      profile,
+      statusText: 'Disponible',
+      phone,
+      messages: []
+    };
+
+    if (isFirebaseConnected && db) {
+      await set(ref(db, `mellow_chats_v2/${roomId}`), newRoom);
+    } else {
+      const updated = { ...rooms, [roomId]: newRoom };
+      setRooms(updated);
+      localStorage.setItem('mellow_rooms_v2', JSON.stringify(updated));
+    }
+    setActiveRoomId(roomId);
+  };
+
   const changeRoomProfile = async (roomId: string, newProfile: 'couple' | 'family' | 'corporate') => {
     if (isFirebaseConnected && db) {
       await update(ref(db, `mellow_chats_v2/${roomId}`), { profile: newProfile });
@@ -368,6 +331,12 @@ export function useChatSync() {
     }
   };
 
+  const logout = async () => {
+    if (auth) {
+      await signOut(auth);
+    }
+  };
+
   return {
     activeRoomId,
     setActiveRoomId,
@@ -376,7 +345,12 @@ export function useChatSync() {
     isFirebaseConnected,
     isSending,
     metrics,
+    currentUser,
+    authLoading,
     sendMessage: handleSendMessage,
-    changeRoomProfile
+    sendProcessedMessage,
+    createRoom,
+    changeRoomProfile,
+    logout
   };
 }

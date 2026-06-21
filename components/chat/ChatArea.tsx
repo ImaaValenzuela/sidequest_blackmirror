@@ -35,7 +35,7 @@ export default function ChatArea({
   }, [messages]);
 
   return (
-    <div className={`flex-1 flex flex-col relative min-w-0 transition-colors ${
+    <div className={`flex-1 flex flex-col relative min-w-0 min-h-0 transition-colors ${
       isDarkMode ? 'bg-[#0b141a]' : 'bg-[#efeae2]'
     }`}>
       

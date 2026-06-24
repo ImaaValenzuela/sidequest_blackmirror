@@ -29,6 +29,8 @@ export interface Room {
   phone: string;
   messages: Message[];
   unreadCount?: number;
+  isGroup?: boolean;
+  isPinned?: boolean;
 }
 
 // Empty baseline for fully dynamic real-time data

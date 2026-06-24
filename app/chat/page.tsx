@@ -11,6 +11,7 @@ import InterceptionModal from '../../components/chat/InterceptionModal';
 import NewChatModal from '../../components/chat/NewChatModal';
 import AdminDashboard from '../../components/chat/AdminDashboard';
 import MellowLogo from '../../components/chat/MellowLogo';
+import MobileChatView from '../../components/chat/MobileChatView';
 import { MessageSquare } from 'lucide-react';
 
 const profileConfig = {
@@ -59,12 +60,21 @@ export default function ChatPage() {
   const [isAuditMode, setIsAuditMode] = useState<boolean>(true);
   const [isInfoOpen, setIsInfoOpen] = useState<boolean>(true);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   // Modal states
   const [interceptionText, setInterceptionText] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isNewChatOpen, setIsNewChatOpen] = useState<boolean>(false);
   const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
+
+  // Detect mobile
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   // Load user theme preference on mount
   useEffect(() => {
@@ -106,7 +116,40 @@ export default function ChatPage() {
   }
 
   const currentRoom = rooms[activeRoomId];
+  const totalUnread = Object.values(rooms).reduce((sum, r) => sum + (r.unreadCount || 0), 0);
 
+  // ── MOBILE LAYOUT ──
+  if (isMobile) {
+    return (
+      <>
+        <MobileChatView
+          rooms={rooms}
+          messages={messages}
+          activeRoomId={activeRoomId}
+          isDarkMode={isDarkMode}
+          isSending={isSending}
+          isAuditMode={isAuditMode}
+          profileConfig={profileConfig}
+          totalUnread={totalUnread}
+          onSelectRoom={setActiveRoomId}
+          onSendMessage={handleInterceptSendMessage}
+        />
+        <InterceptionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          originalText={interceptionText}
+          activeProfile={currentRoom?.profile || 'couple'}
+          isDarkMode={isDarkMode}
+          onConfirmSend={(finalText, original, status, meta) => {
+            sendProcessedMessage(finalText, original, status, meta);
+            setIsModalOpen(false);
+          }}
+        />
+      </>
+    );
+  }
+
+  // ── DESKTOP LAYOUT ──
   return (
     <div 
       className={`relative flex h-screen w-screen overflow-hidden select-none text-[14px] transition-colors duration-150 ${
@@ -123,7 +166,7 @@ export default function ChatPage() {
         onLogout={logout}
         onToggleAdmin={() => setIsAdminOpen(!isAdminOpen)}
         isAdminActive={isAdminOpen}
-        totalUnread={Object.values(rooms).reduce((sum, r) => sum + (r.unreadCount || 0), 0)}
+        totalUnread={totalUnread}
       />
 
       {/* COLUMN 2: CHATS LIST */}

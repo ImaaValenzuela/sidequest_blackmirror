@@ -35,8 +35,8 @@ export default function MessageDiff({
         }`}>
           INTERCEPTADO (CRUDO)
         </div>
-        <p className={`text-[12px] italic line-through break-words mt-0.5 ${
-          isDarkMode ? 'text-zinc-300 decoration-red-900/60' : 'text-zinc-500 decoration-red-300'
+        <p className={`text-[12px] italic break-words mt-0.5 ${
+          isDarkMode ? 'text-zinc-300' : 'text-zinc-500'
         }`}>
           "{originalText}"
         </p>

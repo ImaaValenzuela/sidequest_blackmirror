@@ -24,3 +24,43 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ── Global scrollbar — subtle, dark, minimal ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(134, 150, 160, 0.25);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(134, 150, 160, 0.45);
+}
+
+/* ── Dystopian scrollbar — ForcedMessageWarning modal ── */
+.scrollbar-red::-webkit-scrollbar {
+  width: 3px;
+}
+.scrollbar-red::-webkit-scrollbar-track {
+  background: rgba(30, 0, 0, 0.6);
+}
+.scrollbar-red::-webkit-scrollbar-thumb {
+  background: rgba(185, 28, 28, 0.5);
+  border-radius: 999px;
+}
+.scrollbar-red::-webkit-scrollbar-thumb:hover {
+  background: rgba(220, 38, 38, 0.8);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(134, 150, 160, 0.25) transparent;
+}
+.scrollbar-red {
+  scrollbar-color: rgba(185, 28, 28, 0.5) rgba(30, 0, 0, 0.6);
+}

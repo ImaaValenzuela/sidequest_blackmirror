@@ -350,7 +350,7 @@ function MobileChatArea({ room, messages, isDarkMode, isSending, isAuditMode, on
                 {/* Audit diff */}
                 {isAuditMode && msg.originalText && (
                   <div className={`mt-1 px-3 py-2 rounded-lg text-[11px] max-w-full font-mono border ${isDarkMode ? 'bg-[#0d1f2d] border-cyan-900/40 text-[#8696a0]' : 'bg-zinc-50 border-zinc-200 text-zinc-500'}`}>
-                    <span className="text-rose-400 line-through block">{msg.originalText}</span>
+                    <span className="text-rose-400 block">{msg.originalText}</span>
                     <span className="text-emerald-400 block mt-0.5">{msg.text}</span>
                   </div>
                 )}

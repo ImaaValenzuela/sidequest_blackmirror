@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, ShieldAlert, Users, Radio, ArrowRight, Activity, TrendingDown, Database } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, ShieldAlert, Users, Radio, ArrowRight, Activity, TrendingDown, Database, Sliders } from 'lucide-react';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -18,7 +18,20 @@ export default function AdminDashboard({
   users,
   rooms
 }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'citizens' | 'logs'>('citizens');
+  const [activeTab, setActiveTab] = useState<'citizens' | 'logs' | 'demo'>('citizens');
+  const [infractions, setInfractions] = useState<number>(0);
+
+  useEffect(() => {
+    if (isOpen) {
+      const val = parseInt(localStorage.getItem('mellow_force_count') || '0', 10);
+      setInfractions(val);
+    }
+  }, [isOpen]);
+
+  const handleUpdateInfractions = (val: number) => {
+    localStorage.setItem('mellow_force_count', String(val));
+    setInfractions(val);
+  };
 
   if (!isOpen) return null;
 
@@ -108,6 +121,17 @@ export default function AdminDashboard({
           >
             <Radio size={14} className="animate-pulse" />
             <span>Bitácora de Intercepciones ({allFilteredMessages.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('demo')}
+            className={`py-3 px-4 font-mono text-[11px] font-bold tracking-wider uppercase border-b-2 transition-all flex items-center gap-2 cursor-pointer ${
+              activeTab === 'demo'
+                ? 'border-cyan-500 text-cyan-400'
+                : 'border-transparent text-zinc-500 hover:text-zinc-300'
+            }`}
+          >
+            <Sliders size={14} />
+            <span>Simulador de Infracciones</span>
           </button>
         </div>
 
@@ -237,7 +261,7 @@ export default function AdminDashboard({
                                 Toxicidad: {toxicityPercent}%
                               </span>
                             </div>
-                            <p className="text-xs text-rose-300/80 line-through leading-relaxed italic">
+                            <p className="text-xs text-rose-300/80 leading-relaxed italic">
                               "{log.originalText || log.text}"
                             </p>
                           </div>
@@ -273,6 +297,76 @@ export default function AdminDashboard({
                   })}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB 3: DEMO TOOLS */}
+          {activeTab === 'demo' && (
+            <div className="space-y-6 max-w-xl">
+              <div className="space-y-1.5">
+                <h3 className="text-sm font-bold tracking-wider uppercase font-mono text-cyan-400 flex items-center gap-1.5">
+                  <Sliders size={16} />
+                  Simulador de Infracciones & Demo Tools
+                </h3>
+                <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                  Permite simular el historial de desobediencia para probar cómo escala la interfaz del warning y los perfiles de la Consola.
+                </p>
+              </div>
+
+              {/* Infraction status */}
+              <div className={`p-5 rounded-xl border ${isDarkMode ? 'bg-[#111b21] border-[#222e35]' : 'bg-white border-zinc-200'} space-y-4`}>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">Infracciones Actuales:</span>
+                  <span className="text-xl font-bold font-mono text-red-500">{infractions}</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {[
+                    { label: '0 — Armonía Total', val: 0, desc: 'Warning básico (5s)' },
+                    { label: '3 — Alerta Social', val: 3, desc: 'Presión social (7s)' },
+                    { label: '5 — Vigilancia Activa', val: 5, desc: 'Efectos CRT (10s)' },
+                    { label: '7+ — Resistencia Crítica', val: 7, desc: 'Estética Black Mirror (15s)' },
+                  ].map((tier) => (
+                    <button
+                      key={tier.val}
+                      onClick={() => handleUpdateInfractions(tier.val)}
+                      className={`p-3 rounded-lg border text-left font-mono transition-all cursor-pointer ${
+                        infractions === tier.val || (tier.val === 7 && infractions >= 7)
+                          ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 font-bold'
+                          : isDarkMode
+                          ? 'border-zinc-800 hover:border-zinc-700 text-zinc-400 bg-zinc-950/20'
+                          : 'border-zinc-200 hover:border-zinc-300 text-zinc-600 bg-zinc-50/50'
+                      }`}
+                    >
+                      <div className="text-xs uppercase">{tier.label}</div>
+                      <div className="text-[10px] text-zinc-500 font-normal mt-0.5">{tier.desc}</div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 pt-2 border-t border-zinc-800/40">
+                  <button
+                    onClick={() => handleUpdateInfractions(0)}
+                    className="px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-[10px] font-mono uppercase text-zinc-300 cursor-pointer"
+                  >
+                    Resetear a 0
+                  </button>
+                  <button
+                    onClick={() => handleUpdateInfractions(infractions + 1)}
+                    className="px-3 py-1.5 rounded bg-rose-950/40 hover:bg-rose-900/40 border border-rose-900/50 text-[10px] font-mono uppercase text-rose-400 cursor-pointer"
+                  >
+                    +1 Infracción
+                  </button>
+                </div>
+              </div>
+
+              {/* Status information */}
+              <div className="text-[11px] font-mono text-zinc-500 leading-relaxed space-y-1 bg-zinc-950/15 p-3.5 rounded border border-zinc-800/40">
+                <p className="font-bold text-zinc-400 uppercase tracking-widest text-[9px] mb-1">Guía para la Demo:</p>
+                <p>• Escribí un mensaje hostil (ej: &quot;sos un inútil&quot;) para gatillar la consola.</p>
+                <p>• Intentá &quot;Forzar Original&quot; para ver el countdown y la barra de progreso.</p>
+                <p>• Los mensajes neutrales (ej: &quot;hola cómo estás&quot;) se auto-aprobarán inmediatamente.</p>
+              </div>
             </div>
           )}
 

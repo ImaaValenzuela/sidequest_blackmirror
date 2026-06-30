@@ -228,7 +228,7 @@ export function useChatSync() {
     const newMsg: Message = {
       id: messageId,
       sender: 'me',
-      text: 'Mellow está puliendo tu tono...',
+      text: textToSend,
       originalText: textToSend,
       status: 'filtering',
       timestamp: Date.now(),
@@ -316,15 +316,21 @@ export function useChatSync() {
     if (!activeRoomId) return;
     const targetProfile = rooms[activeRoomId].profile;
     const messageId = `msg-${Date.now()}`;
+
+    // Forced messages don't store originalText so MessageDiff won't render —
+    // the quarantine bubble is the visual signal of the infraction.
+    // Firebase rejects `undefined` values, so we omit the key entirely.
     const newMsg: Message = {
       id: messageId,
       sender: 'me',
       text,
-      originalText,
+      ...(status !== 'failed' && originalText !== undefined ? { originalText } : {}),
       status,
       timestamp: Date.now(),
       profile: targetProfile,
-      ...metadata
+      ...(metadata?.toxicityLevel !== undefined ? { toxicityLevel: metadata.toxicityLevel } : {}),
+      ...(metadata?.originalTone !== undefined ? { originalTone: metadata.originalTone } : {}),
+      ...(metadata?.savedMetric !== undefined ? { savedMetric: metadata.savedMetric } : {}),
     };
 
     if (isFirebaseConnected && db) {
@@ -339,9 +345,16 @@ export function useChatSync() {
             const userKey = Object.keys(usersVal).find(k => usersVal[k].phone.replace(/[\s\-\(\)]/g, '') === cleanPhone);
             if (userKey) {
               const user = usersVal[userKey];
-              const newCount = (user.interceptedCount || 0) + 1;
               const msgToxicity = metadata?.toxicityLevel || 0;
-              const newEmpathy = Math.max(0.1, Math.min(1.0, user.empathyScore - (msgToxicity * 0.04) + 0.01));
+              const newCount = (user.interceptedCount || 0) + 1;
+
+              // Forced messages: heavy penalty (toxicity * 0.12, min -0.05)
+              // Sweetened messages: small positive nudge for using the buffer
+              const empathyDelta = status === 'failed'
+                ? -(Math.max(0.05, msgToxicity * 0.12))
+                : -(msgToxicity * 0.02) + 0.015;
+
+              const newEmpathy = Math.max(0.05, Math.min(1.0, (user.empathyScore || 0.8) + empathyDelta));
               
               update(ref(db, `mellow_users/${userKey}`), {
                 interceptedCount: newCount,

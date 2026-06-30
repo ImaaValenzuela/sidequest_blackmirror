@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Clock, CheckCheck } from 'lucide-react';
+import { Clock, CheckCheck, ShieldX } from 'lucide-react';
 import { Message } from '../../hooks/useChatSync';
 import MessageDiff from './MessageDiff';
 
@@ -14,45 +14,86 @@ interface MessageBubbleProps {
 export default function MessageBubble({
   message,
   isAuditMode,
-  isDarkMode
+  isDarkMode,
 }: MessageBubbleProps) {
   const isMe = message.sender === 'me' || message.senderId === '+5491155559999' || message.senderName === 'Tú';
   const isFiltering = message.status === 'filtering';
   const isFailed = message.status === 'failed';
 
+  // Forced raw messages render as a "quarantine" block instead of a normal bubble
+  if (isMe && isFailed) {
+    return (
+      <div className="flex flex-col max-w-[70%] ml-auto items-end">
+        {/* Quarantine / infraction block */}
+        <div
+          className="w-full border border-dashed border-red-700/50 rounded-lg overflow-hidden"
+          style={{ background: 'rgba(30, 5, 5, 0.7)' }}
+        >
+          {/* Infraction header bar */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/60 border-b border-red-800/40">
+            <ShieldX size={11} className="text-red-500 shrink-0" />
+            <span className="text-[9px] font-mono tracking-[0.15em] text-red-500 uppercase">
+              Infracción de Convivencia — Mellow Middleware
+            </span>
+          </div>
+
+          {/* Message text */}
+          <div className="px-3 py-2.5">
+            <p className="text-[13px] leading-relaxed text-zinc-300 break-words">{message.text}</p>
+
+            {/* Time row */}
+            <div className="flex items-center justify-end gap-1.5 mt-1 text-[10px] font-mono text-red-800">
+              <span>{new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="font-bold text-red-700">!</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Audit mode diff below */}
+        {isAuditMode && message.originalText && (
+          <MessageDiff
+            originalText={message.originalText}
+            text={message.text}
+            originalTone={message.originalTone}
+            toxicityLevel={message.toxicityLevel}
+            savedMetric={message.savedMetric}
+            isDarkMode={isDarkMode}
+            isFiltering={false}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={`flex flex-col max-w-[65%] ${isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
       {/* WhatsApp-style bubble */}
-      <div 
+      <div
         className={`px-3 py-1.5 text-[14px] leading-relaxed relative group shadow-sm transition-all ${
-          isMe 
-            ? isFiltering 
-              ? 'bg-cyan-950 border border-cyan-800/60 rounded-lg rounded-tr-none animate-pulse text-[#e9edef]' 
-              : isFailed
-                ? isDarkMode
-                  ? 'bg-red-950/60 border border-red-800/40 rounded-lg rounded-tr-none text-[#e9edef]'
-                  : 'bg-red-50 border border-red-200 rounded-lg rounded-tr-none text-red-700 font-medium'
-                : isDarkMode 
-                  ? 'bg-[#005c4b] rounded-lg rounded-tr-none text-[#e9edef]' 
-                  : 'bg-[#d9fdd3] rounded-lg rounded-tr-none text-[#111b21]'
+          isMe
+            ? isFiltering
+              ? 'bg-cyan-950 border border-cyan-800/60 rounded-lg rounded-tr-none animate-pulse text-[#e9edef]'
+              : isDarkMode
+              ? 'bg-[#005c4b] rounded-lg rounded-tr-none text-[#e9edef]'
+              : 'bg-[#d9fdd3] rounded-lg rounded-tr-none text-[#111b21]'
             : isFiltering
-              ? isDarkMode 
-                ? 'bg-[#202c33]/70 border border-[#2a3942] rounded-lg rounded-tl-none animate-pulse text-[#e9edef]' 
-                : 'bg-white/80 border border-zinc-200 rounded-lg rounded-tl-none animate-pulse text-[#111b21]'
-              : isDarkMode 
-                ? 'bg-[#202c33] rounded-lg rounded-tl-none text-[#e9edef]' 
-                : 'bg-[#ffffff] rounded-lg rounded-tl-none text-[#111b21]'
+            ? isDarkMode
+              ? 'bg-[#202c33]/70 border border-[#2a3942] rounded-lg rounded-tl-none animate-pulse text-[#e9edef]'
+              : 'bg-white/80 border border-zinc-200 rounded-lg rounded-tl-none animate-pulse text-[#111b21]'
+            : isDarkMode
+            ? 'bg-[#202c33] rounded-lg rounded-tl-none text-[#e9edef]'
+            : 'bg-[#ffffff] rounded-lg rounded-tl-none text-[#111b21]'
         }`}
       >
         {/* Message contents */}
-        <div className="break-words pb-1">
-          {message.text}
-        </div>
+        <div className="break-words pb-1">{message.text}</div>
 
         {/* Time & status checks */}
-        <div className={`flex items-center justify-end gap-1 text-[11px] select-none h-4 ${
-          isDarkMode ? 'text-[#8696a0]' : 'text-[#667781]'
-        }`}>
+        <div
+          className={`flex items-center justify-end gap-1 text-[11px] select-none h-4 ${
+            isDarkMode ? 'text-[#8696a0]' : 'text-[#667781]'
+          }`}
+        >
           <span>
             {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
@@ -60,8 +101,6 @@ export default function MessageBubble({
             <span>
               {isFiltering ? (
                 <Clock size={11} className="text-cyan-400" />
-              ) : isFailed ? (
-                <span className="text-rose-500 font-bold">!</span>
               ) : (
                 <CheckCheck size={15} className="text-[#53bdeb]" />
               )}
@@ -70,7 +109,7 @@ export default function MessageBubble({
         </div>
       </div>
 
-      {/* Audit Mode (Git Diff styled as an official WhatsApp Quote/Reply block) */}
+      {/* Audit Mode diff block */}
       {isAuditMode && message.originalText && (
         <MessageDiff
           originalText={message.originalText}

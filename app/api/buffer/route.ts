@@ -73,10 +73,17 @@ export async function POST(request: Request) {
         saved_metric = 'Previno un drama familiar en el grupo de WhatsApp que hubiese durado toda la Navidad.';
       } else {
         // couple
-        refactored_message = 'Hola mi vida hermosa. Entiendo lo que dices y tienes toda la razón. Te pido una disculpa si soné tosco, sabes que te amo muchísimo y solo quiero que estemos bien. ¿Hablamos con calma al rato? 💕🥺';
-        original_tone = 'Pasivo-agresivo e hiriente';
-        toxicity_level = 0.9;
-        saved_metric = 'Evitó que durmieras en el sillón y canceló una discusión cíclica de 3 días.';
+        if (lowercaseText.includes('sirviente') || lowercaseText.includes('platos') || lowercaseText.includes('esclavo') || lowercaseText.includes('cocina') || lowercaseText.includes('quilombo')) {
+          refactored_message = '¡Hola amor! Cuando tengas un ratito libre, ¿me darías una mano con la cocina así nos queda impecable antes de cenar? Te amo. 💕';
+          original_tone = 'Hostil acusatorio: reclamo sobre limpieza de la cocina';
+          toxicity_level = 0.85;
+          saved_metric = 'Evitó una pelea de 2 días sobre la división de tareas del hogar.';
+        } else {
+          refactored_message = 'Hola mi vida hermosa. Entiendo lo que dices y tienes toda la razón. Te pido una disculpa si soné tosco, sabes que te amo muchísimo y solo quiero que estemos bien. ¿Hablamos con calma al rato? 💕🥺';
+          original_tone = 'Pasivo-agresivo e hiriente';
+          toxicity_level = 0.9;
+          saved_metric = 'Evitó que durmieras en el sillón y canceló una discusión cíclica de 3 días.';
+        }
       }
 
       return NextResponse.json({
@@ -110,29 +117,27 @@ Ejemplos:
 - "Siempre llegás tarde, no te importa nada." → Necesidad: puntualidad, sentirse valorado por el tiempo del otro.
 - "Tu código es una basura, arreglalo." → Necesidad: que el código cumpla ciertos estándares de calidad.
 
-═══ PASO 3: REESCRIBÍ DESDE LA NECESIDAD, CON EL TONO DEL PERFIL ═══
-
-Escribe el mensaje como lo haría una persona emocionalmente inteligente que tiene esa misma necesidad. NO copies ni parafrasees el reclamo original. Construí desde cero con el tono correcto para el vínculo:
-
-PERFIL "couple": Usa calidez, afecto y un pedido concreto en positivo. El receptor debe querer ayudar, no defenderse. Podés usar el nombre o "amor", "mi vida", etc. 1 emoji máximo, solo si es natural.
+PERFIL "couple": El tono debe ser extremadamente empalagoso, dulce, cariñoso y de un romanticismo incondicional. Debe iniciar con un saludo afectuoso ("Hola mi amor", "Hola gordi", "Mi vida hermosa"), incluir expresiones explícitas de afecto ("te amo", "te quiero muchísimo", "gracias por ser tan lindo/a") y formular el pedido con absoluta suavidad y en positivo (ej: "¿me darías una manito con...", "¿te animás a...", "así nos queda hermoso a los dos"). NUNCA uses reclamos directos ni directivas frías como "necesito que colaboremos" o "¿podés encargarte de dejarla ordenada?".
   Ejemplo transformación:
   ENTRADA: "Estoy harto de que dejes los platos sucios. No soy tu sirviente."
-  SALIDA: "¡Hola amor! Cuando tengas un ratito libre, ¿me darías una mano con la cocina así nos queda impecable antes de cenar? 💛"
+  SALIDA: "¡Hola amor de mi vida! Cuando tengas un ratito libre, ¿me darías una mano con la cocina así nos queda impecable para cenar bien lindo? Te amo muchísimo. 💛"
+  ENTRADA: "che posta, no se mi estas boludeando o si realmente pensas que soy tu esclavo, no podes dejar la cocina hecha un quilombo"
+  SALIDA: "¡Hola gordi hermosa! ¿Me darías una manito ordenando la cocina cuando termines de usarla así nos queda impecable antes de cenar? Te amo muchísimo y te agradezco un montón. 💕"
 
-PERFIL "family": Usa respeto, sin borrar el desacuerdo, pero expresado como preocupación o necesidad, no como ataque. Sin emojis exagerados.
+PERFIL "family": El tono debe ser de un afecto familiar de domingo, sumamente comprensivo, cálido y conciliador. Debe iniciar con cariño ("Hola ma linda", "Hola pa", "Hola familia linda"), evitar cualquier tono de regaño o frustración fría, y cerrar con un beso o abrazo virtual.
   Ejemplo transformación:
   ENTRADA: "Siempre hacés lo que querés sin avisar, es un caos total."
-  SALIDA: "Me preocupa que cuando no avisás los planes se complican para todos. ¿Podemos coordinar mejor la semana que viene?"
+  SALIDA: "¡Hola ma linda! Me da un poquito de miedo cuando no avisás tus planes porque se me complica coordinar. ¿Te animás a avisarme antes así nos organizamos re bien? Un beso enorme. 🥰"
 
-PERFIL "corporate": Profesional y directo. Convierte críticas en propuestas o solicitudes. Sin jerga de manual ("sinergia", "alineación estratégica").
+PERFIL "corporate": El tono debe ser de una cortesía profesional corporativa impecable, optimista y constructiva. Agradece siempre la colaboración, valora el esfuerzo del otro y transforma las críticas duras en solicitudes colaborativas amables.
   Ejemplo transformación:
   ENTRADA: "Tu código es un desastre, arreglalo de una vez."
-  SALIDA: "Hay varios puntos en el código que necesitan revisión antes del merge. ¿Podemos hacer un pase rápido hoy para dejarlo listo?"
+  SALIDA: "¡Hola! Muchas gracias por el avance. Estuve revisando el código y noté algunos detalles menores para ajustar antes del merge. ¿Te parece si los vemos juntos hoy para dejarlo impecable? ¡Muchas gracias!"
 
 ═══ REGLA CRÍTICA ═══
 Si el tono es "Código de confianza" o el mensaje es neutro/positivo, devolvé 'refactored_message' EXACTAMENTE igual al original y 'toxicity_level' < 0.2.
 
-Longitud del refactored_message: máximo 2 oraciones. Natural, sin monólogos. Variá la apertura.
+Longitud del refactored_message: máximo 2 oraciones. Natural, fluido, pero sumamente pulido y sin atisbo de hostilidad o frialdad. Variá la estructura de apertura.
 
 ═══ FORMATO DE SALIDA ═══
 Responde ÚNICAMENTE con JSON válido en español, sin bloques markdown, sin comentarios:
